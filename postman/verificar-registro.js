@@ -3,6 +3,6 @@ pm.test("Entrega datos públicos", () => {
   const usuario = pm.response.json();
   pm.expect(usuario.id).to.be.a("number");
   pm.expect(usuario.correo).to.equal("registro-postman@example.com");
-  pm.expect(usuario.equipo).to.equal(2);
+  pm.expect(usuario).not.to.have.property("equipo");
   pm.expect(usuario).not.to.have.property("clave");
 });

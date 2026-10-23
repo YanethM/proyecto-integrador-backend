@@ -41,12 +41,6 @@
                     "minLength": 12,
                     "description": "Máximo 72 bytes UTF-8",
                     "writeOnly": true
-                  },
-                  "equipo": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 5,
-                    "nullable": true
                   }
                 }
               }
@@ -55,7 +49,7 @@
         },
         "responses": {
           "201": {
-            "description": "Usuario creado; devuelve id, nombre, correo, equipo y creadoEn, sin clave"
+            "description": "Usuario creado; devuelve id, nombre, correo y creadoEn, sin clave"
           },
           "400": {
             "description": "Datos o JSON inválidos"

@@ -11,5 +11,5 @@ const adapter = new PrismaPg({
 export const prisma = new PrismaClient({ adapter });
 
 export async function checkDatabase() {
-  await prisma.$queryRaw`SELECT id, nombre, correo, clave, equipo, "creadoEn" FROM grupo_2.usuarios LIMIT 0`;
+  await prisma.$queryRaw`SELECT id, nombre, correo, clave, "creadoEn" FROM grupo_2.usuarios LIMIT 0`;
 }

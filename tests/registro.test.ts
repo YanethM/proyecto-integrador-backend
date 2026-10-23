@@ -29,12 +29,12 @@ test("registro HTTP con PostgreSQL aislado", { skip: !process.env["TEST_DATABASE
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
   try {
-    const response = await post({ nombre: "  Ana Peña  ", correo: ` ${correo.toUpperCase()} `, clave, equipo: 2 });
+    const response = await post({ nombre: "  Ana Peña  ", correo: ` ${correo.toUpperCase()} `, clave });
     assert.equal(response.status, 201);
     const usuario = await response.json();
     assert.equal(usuario.nombre, "Ana Peña");
     assert.equal(usuario.correo, correo);
-    assert.equal(usuario.equipo, 2);
+    assert.equal("equipo" in usuario, false);
     assert.equal("clave" in usuario, false);
     const stored = await prisma.usuario.findUniqueOrThrow({ where: { correo } });
     assert.notEqual(stored.clave, clave);
@@ -42,8 +42,8 @@ test("registro HTTP con PostgreSQL aislado", { skip: !process.env["TEST_DATABASE
     assert.equal((await post({ nombre: "Ana", correo, clave })).status, 409);
     for (const body of [
       {}, { nombre: " ", correo, clave }, { nombre: "Ana", correo: "invalido", clave },
-      { nombre: "Ana", correo, clave: "corta" }, { nombre: "Ana", correo, clave, equipo: 6 },
-      { nombre: "Ana", correo, clave, equipo: "2" }, { nombre: "Ana", correo, clave: "ñ".repeat(37) },
+      { nombre: "Ana", correo, clave: "corta" }, { nombre: "Ana", correo, clave, equipo: 2 },
+      { nombre: "Ana", correo, clave: "ñ".repeat(37) },
       { nombre: "Ana", correo, clave, rol: "admin" },
     ]) assert.equal((await post(body)).status, 400);
     const malformed = await fetch(`${base}/auth/registro`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{" });

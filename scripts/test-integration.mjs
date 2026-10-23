@@ -18,7 +18,7 @@ try {
   }
   if (!ready) throw new Error('PostgreSQL no inició');
   const port = run('docker', ['port', container, '5432/tcp']).split(':').at(-1);
-  const sql = 'CREATE ROLE anon; CREATE ROLE authenticated;\n' + readFileSync('supabase/sql/20261023_grupo_2.sql', 'utf8');
+  const sql = 'CREATE ROLE anon; CREATE ROLE authenticated;\n' + readFileSync('supabase/sql/20261023_grupo_2.sql', 'utf8') + readFileSync('supabase/sql/20261023_remove_usuario_equipo.sql', 'utf8');
   run('docker', ['exec', '-i', container, 'psql', '-U', 'postgres', '-d', 'registro_test', '-v', 'ON_ERROR_STOP=1', '-q'], { input: sql });
   const result = spawnSync('npm', ['test'], { stdio: 'inherit', env: { ...process.env, TEST_DATABASE_URL: `postgresql://postgres:local_test_only@127.0.0.1:${port}/registro_test` } });
   process.exitCode = result.status ?? 1;
