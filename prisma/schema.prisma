@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["grupo_2"]
+}
+
+model Usuario {
+  id       Int      @id @default(autoincrement())
+  nombre   String
+  correo   String   @unique
+  clave    String
+  equipo   Int?
+  creadoEn DateTime @default(now()) @db.Timestamp(3)
+
+  @@map("usuarios")
+  @@schema("grupo_2")
+}
