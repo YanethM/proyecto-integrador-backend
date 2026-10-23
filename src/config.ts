@@ -14,5 +14,20 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   }
   const port = Number(env["PORT"] ?? 3000);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("PORT debe estar entre 1 y 65535");
-  return { databaseUrl: value, port, host: env["HOST"] ?? "127.0.0.1" };
+  const trustProxyHops = Number(env["TRUST_PROXY_HOPS"] ?? 0);
+  if (!Number.isInteger(trustProxyHops) || trustProxyHops < 0 || trustProxyHops > 5) {
+    throw new Error("TRUST_PROXY_HOPS debe ser un entero entre 0 y 5");
+  }
+  const corsOrigins = (env["CORS_ORIGINS"] ?? "").split(",").map(value => value.trim()).filter(Boolean);
+  for (const origin of corsOrigins) {
+    let parsed: URL;
+    try { parsed = new URL(origin); } catch { throw new Error("CORS_ORIGINS contiene un origen inválido"); }
+    if (!["http:", "https:"].includes(parsed.protocol) || parsed.origin !== origin) {
+      throw new Error("CORS_ORIGINS requiere orígenes exactos, sin rutas ni barra final");
+    }
+  }
+  if (env["NODE_ENV"] === "production" && corsOrigins.length === 0) {
+    throw new Error("Configure CORS_ORIGINS con los dominios de los frontends");
+  }
+  return { corsOrigins, trustProxyHops, databaseUrl: value, port, host: env["HOST"] ?? "127.0.0.1" };
 }

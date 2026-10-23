@@ -15,6 +15,8 @@ test("registro HTTP con PostgreSQL aislado", { skip: !process.env["TEST_DATABASE
   assert.equal(url.hostname, "127.0.0.1");
   assert.equal(url.pathname, "/registro_test");
   process.env["DATABASE_URL"] = url.toString();
+  process.env["CORS_ORIGINS"] = "https://equipo.example.com";
+  process.env["TRUST_PROXY_HOPS"] = "0";
   const { app } = await import("../src/app.js");
   const { prisma, checkDatabase } = await import("../src/prisma.js");
   await checkDatabase();
@@ -29,6 +31,16 @@ test("registro HTTP con PostgreSQL aislado", { skip: !process.env["TEST_DATABASE
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
   try {
+    assert.equal((await fetch(`${base}/health`)).status, 200);
+    const preflight = await fetch(`${base}/auth/registro`, {
+      method: "OPTIONS",
+      headers: { Origin: "https://equipo.example.com", "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type" },
+    });
+    assert.equal(preflight.status, 204);
+    assert.equal(preflight.headers.get("access-control-allow-origin"), "https://equipo.example.com");
+    const denied = await fetch(`${base}/auth/registro`, { method: "POST", headers: { Origin: "https://otro.example.com" } });
+    assert.equal(denied.status, 403);
+    assert.equal(denied.headers.get("access-control-allow-origin"), null);
     const response = await post({ nombre: "  Ana Peña  ", correo: ` ${correo.toUpperCase()} `, clave });
     assert.equal(response.status, 201);
     const usuario = await response.json();

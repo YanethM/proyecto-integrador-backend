@@ -65,6 +65,22 @@
           },
           "503": {
             "description": "Registro no disponible"
+          },
+          "403": {
+            "description": "Origen no autorizado por CORS"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Verificar conexión a PostgreSQL",
+        "responses": {
+          "200": {
+            "description": "Base disponible; status ok"
+          },
+          "503": {
+            "description": "Base no disponible; status unavailable"
           }
         }
       }
